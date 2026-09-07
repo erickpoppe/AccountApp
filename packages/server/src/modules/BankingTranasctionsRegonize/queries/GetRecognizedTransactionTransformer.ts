@@ -30,6 +30,7 @@ export class GetRecognizedTransactionTransformer extends Transformer {
       'formattedWithdrawalAmount',
       'bankRuleId',
       'bankRuleName',
+      'isCategorized',
     ];
   };
 
@@ -257,5 +258,9 @@ export class GetRecognizedTransactionTransformer extends Transformer {
    */
   protected bankRuleName(transaction) {
     return transaction.recognizedTransaction.bankRule.name;
+  }
+
+  public isCategorized(transaction: any): boolean {
+  return transaction.categorized === true;
   }
 }

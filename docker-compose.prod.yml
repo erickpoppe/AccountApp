@@ -127,6 +127,12 @@ services:
       - STRIPE_PAYMENT_WEBHOOKS_SECRET=${STRIPE_PAYMENT_WEBHOOKS_SECRET}
       - STRIPE_PAYMENT_REDIRECT_URL=${STRIPE_PAYMENT_REDIRECT_URL}
 
+      # Local AI categorization (Ollama)
+      - BANKING_AI_ENABLED=${BANKING_AI_ENABLED:-false}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - BANKING_AI_MODEL=${BANKING_AI_MODEL:-qwen2.5:3b-instruct}
+      - BANKING_AI_TIMEOUT_MS=${BANKING_AI_TIMEOUT_MS:-30000}
+
   database_migration:
     container_name: bigcapital-database-migration
     build:
@@ -182,6 +188,27 @@ services:
     networks:
       - bigcapital_network
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: bigcapital-ollama
+    volumes:
+      - ollama_models:/root/.ollama
+    expose:
+      - '11434'
+    networks:
+      - bigcapital_network
+    restart: on-failure
+
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "OLLAMA_HOST=ollama:11434 ollama pull ${BANKING_AI_MODEL:-qwen2.5:3b-instruct}"
+    restart: 'no'
+    networks:
+      - bigcapital_network
+
 # Volumes
 volumes:
   mysql:
@@ -190,6 +217,10 @@ volumes:
 
   redis:
     name: bigcapital_prod_redis
+    driver: local
+
+  ollama_models:
+    name: bigcapital_prod_ollama_models
     driver: local
 
 # Networks

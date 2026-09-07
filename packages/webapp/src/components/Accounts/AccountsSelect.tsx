@@ -3,6 +3,7 @@ import React from 'react';
 import * as R from 'ramda';
 import intl from 'react-intl-universal';
 import { MenuItem } from '@blueprintjs/core';
+import { useFormikContext } from 'formik';
 import { MenuItemNestedText, FSelect } from '@/components';
 import { accountPredicate } from './_components';
 import { DialogsName } from '@/constants/dialogs';
@@ -55,6 +56,7 @@ function AccountsSelectRoot({
   // #ownProps
   items,
   allowCreate,
+  name,
 
   filterByParentTypes,
   filterByTypes,
@@ -63,6 +65,8 @@ function AccountsSelectRoot({
 
   ...restProps
 }) {
+  const { setFieldValue } = useFormikContext();
+
   // Filters accounts based on filter props.
   const filteredAccounts = usePreprocessingAccounts(items, {
     filterByParentTypes,
@@ -76,13 +80,17 @@ function AccountsSelectRoot({
     ? createNewItemFromQuery
     : null;
 
-  // Handles the create item click.
+  // Handles the create item click — passes a callback so the new account is
+  // auto-selected in this field once the dialog saves.
   const handleCreateItemClick = () => {
-    openDialog(DialogsName.AccountForm);
+    openDialog(DialogsName.AccountForm, {
+      onAccountCreated: (account) => setFieldValue(name, account.id),
+    });
   };
 
   return (
     <FSelect
+      name={name}
       items={filteredAccounts}
       textAccessor={'name'}
       labelAccessor={'code'}

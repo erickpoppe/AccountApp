@@ -13,7 +13,11 @@ const GeneralLedgerContext = createContext();
 function GeneralLedgerProvider({ query, ...props }) {
   // Transformes the report query to request query.
   const httpQuery = React.useMemo(
-    () => transformFilterFormToQuery(query),
+    () =>  {
+      const q = transformFilterFormToQuery(query);
+      console.log('GL httpQuery sent to API:', q);
+      return q;
+    },
     [query],
   );
   const {

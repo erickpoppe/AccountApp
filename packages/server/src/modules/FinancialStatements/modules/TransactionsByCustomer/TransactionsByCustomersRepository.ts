@@ -98,9 +98,9 @@ export class TransactionsByCustomersRepository extends TransactionsByContactRepo
       .subtract(1, 'days')
       .toDate();
 
-    // Retrieve all ledger transactions of the opening balance of.
+    const customerIds = map(this.customers, 'id') as number[];
     const openingBalanceEntries =
-      await this.getCustomersOpeningBalanceEntries(openingBalanceDate);
+      await this.getCustomersOpeningBalanceEntries(openingBalanceDate, customerIds);
 
     this.openingBalanceEntries = openingBalanceEntries;
   }
@@ -156,7 +156,7 @@ export class TransactionsByCustomersRepository extends TransactionsByContactRepo
     // @ts-ignore
     return R.compose(
       R.map(R.assoc('date', openingDate)),
-      R.map(R.assoc('accountNormal', 'debit')),
+      R.map(R.assoc('accountNormal', 'credit')),
     )(openingTransactions);
   }
 
@@ -178,12 +178,13 @@ export class TransactionsByCustomersRepository extends TransactionsByContactRepo
 
     // @ts-ignore
     return R.pipe(
-      R.map(R.assoc('accountNormal', 'debit')),
+      R.map(R.assoc('accountNormal', 'credit')),
       R.map((trans) => ({
         ...trans,
         // @ts-ignore
-        referenceTypeFormatted: '',
-        // referenceTypeFormatted: trans.referenceTypeFormatted,
+        contactId: trans.contactId,
+        // @ts-ignore
+        referenceTypeFormatted: trans.referenceTypeFormatted,
       })),
     )(transactions);
   }
@@ -206,35 +207,34 @@ export class TransactionsByCustomersRepository extends TransactionsByContactRepo
   }
 
   /**
-   * Retrieves the accounts receivable.
-   * @returns {Promise<IAccount[]>}
+   * Retrieves the income accounts (used for bank-categorized customer transactions).
+   * @returns {Promise<Account[]>}
    */
-  public async getReceivableAccounts(): Promise<Account[]> {
-    const accounts = await this.accountModel()
+  public async getIncomeAccounts(): Promise<Account[]> {
+    return this.accountModel()
       .query()
-      .where('accountType', ACCOUNT_TYPE.ACCOUNTS_RECEIVABLE);
-    return accounts;
+      .whereIn('accountType', [ACCOUNT_TYPE.INCOME, ACCOUNT_TYPE.OTHER_INCOME]);
   }
 
   /**
    * Retrieve the customers opening balance transactions.
    * @param {number} openingDate - Opening date.
-   * @param {number} customersIds - Customers ids.
+   * @param {number[]} customersIds - Customers ids.
    * @returns {Promise<IAccountTransaction[]>}
    */
   public async getCustomersOpeningBalanceTransactions(
     openingDate: DateInput,
     customersIds?: number[],
   ): Promise<AccountTransaction[]> {
-    const receivableAccounts = await this.getReceivableAccounts();
-    const receivableAccountsIds = map(receivableAccounts, 'id');
+    const incomeAccounts = await this.getIncomeAccounts();
+    const incomeAccountIds = map(incomeAccounts, 'id');
 
     const openingTransactions = await this.accountTransactionModel()
       .query()
       .modify(
         'contactsOpeningBalance',
         openingDate,
-        receivableAccountsIds,
+        incomeAccountIds,
         customersIds,
       );
     return openingTransactions;
@@ -250,20 +250,20 @@ export class TransactionsByCustomersRepository extends TransactionsByContactRepo
     fromDate: DateInput,
     toDate: DateInput,
   ): Promise<AccountTransaction[]> {
-    const receivableAccounts = await this.getReceivableAccounts();
-    const receivableAccountsIds = map(receivableAccounts, 'id');
+    const incomeAccounts = await this.getIncomeAccounts();
+    const incomeAccountIds = map(incomeAccounts, 'id');
+    const customerIds = map(this.customers, 'id') as number[];
 
     const transactions = await this.accountTransactionModel()
       .query()
       .onBuild((query) => {
-        // Filter by date.
         query.modify('filterDateRange', fromDate, toDate);
-
-        // Filter by customers.
-        query.whereNot('contactId', null);
-
-        // Filter by accounts.
-        query.whereIn('accountId', receivableAccountsIds);
+        query.whereIn('accountId', incomeAccountIds);
+        if (customerIds.length > 0) {
+          query.whereIn('contactId', customerIds);
+        } else {
+          query.whereNot('contactId', null);
+        }
       });
     return transactions;
   }

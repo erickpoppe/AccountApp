@@ -10,9 +10,10 @@ import {
 } from '@/components';
 import { useCategorizeTransactionBoot } from '../CategorizeTransactionBoot';
 import { CategorizeTransactionBranchField } from '../CategorizeTransactionBranchField';
+import { VendorsSelect } from '@/components/Vendors/VendorsSelect';
 
 export default function CategorizeTransactionOtherExpense() {
-  const { accounts } = useCategorizeTransactionBoot();
+  const { accounts, vendors } = useCategorizeTransactionBoot();
 
   return (
     <>
@@ -51,15 +52,23 @@ export default function CategorizeTransactionOtherExpense() {
         <AccountsSelect
           name={'creditAccountId'}
           items={accounts}
-          filterByRootTypes={['expense']}
           fastField
           fill
           allowCreate
         />
       </FFormGroup>
 
+      <FFormGroup name={'contactId'} label={'Vendor'} fastField inline>
+        <VendorsSelect
+          name={'contactId'}
+          items={vendors || []}
+          fastField
+          fill
+        />
+      </FFormGroup>
+
       <FFormGroup name={'referenceNo'} label={'Reference No.'} fastField inline>
-        <FInputGroup name={'reference_no'} fill />
+        <FInputGroup name={"referenceNo"} fill />
       </FFormGroup>
 
       <FFormGroup name={'description'} label={'Description'} fastField inline>

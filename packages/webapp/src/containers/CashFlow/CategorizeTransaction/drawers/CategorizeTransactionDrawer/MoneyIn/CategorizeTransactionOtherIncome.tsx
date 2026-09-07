@@ -10,9 +10,10 @@ import {
 } from '@/components';
 import { useCategorizeTransactionBoot } from '../CategorizeTransactionBoot';
 import { CategorizeTransactionBranchField } from '../CategorizeTransactionBranchField';
+import { CustomersSelect } from '@/components/Customers/CustomersSelect';
 
 export default function CategorizeTransactionOtherIncome() {
-  const { accounts } = useCategorizeTransactionBoot();
+  const { accounts, customers } = useCategorizeTransactionBoot();
 
   return (
     <>
@@ -51,10 +52,18 @@ export default function CategorizeTransactionOtherIncome() {
         <AccountsSelect
           name={'creditAccountId'}
           items={accounts}
-          filterByRootTypes={['income']}
           fastField
           fill
           allowCreate
+        />
+      </FFormGroup>
+
+      <FFormGroup name={'contactId'} label={'Customer'} fastField inline>
+        <CustomersSelect
+          name={'contactId'}
+          items={customers || []}
+          fastField
+          fill
         />
       </FFormGroup>
 

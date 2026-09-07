@@ -15,12 +15,23 @@ export class GetAutofillCategorizeTransctionTransformer extends Transformer {
       'formattedDate',
       'creditAccountId',
       'debitAccountId',
+      'contactId',
       'referenceNo',
+      'description',
       'transactionType',
       'recognizedByRuleId',
       'recognizedByRuleName',
       'isWithdrawalTransaction',
       'isDepositTransaction',
+      'isAiSuggested',
+      'isHistoryAutoFill',
+      'aiSuggestedAccountId',
+      'aiSuggestedAccountName',
+      'aiSuggestedPayee',
+      'aiSuggestedMemo',
+      'aiConfidence',
+      'aiReasoning',
+      'aiSource',
     ];
   };
 
@@ -95,15 +106,26 @@ export class GetAutofillCategorizeTransctionTransformer extends Transformer {
     return this.options.firstUncategorizedTransaction?.referenceNo || null;
   }
 
+  public description() {
+    return this.options.firstUncategorizedTransaction?.description || null;
+  }
+
   /**
    *
    * @returns {number}
    */
   public creditAccountId() {
+    if (this.options.aiSuggestion?.autoFill && this.options.aiSuggestion?.creditAccountId) {
+      return this.options.aiSuggestion.creditAccountId;
+    }
     return (
       this.options.firstUncategorizedTransaction?.recognizedTransaction
         ?.assignedAccountId || null
     );
+  }
+
+  public isHistoryAutoFill() {
+    return !!this.options.aiSuggestion?.autoFill;
   }
 
   /**
@@ -112,6 +134,16 @@ export class GetAutofillCategorizeTransctionTransformer extends Transformer {
    */
   public debitAccountId() {
     return this.options.firstUncategorizedTransaction?.accountId || null;
+  }
+
+  public contactId() {
+    if (this.options.aiSuggestion?.contactId) {
+      return this.options.aiSuggestion.contactId;
+    }
+    return (
+      this.options.firstUncategorizedTransaction?.recognizedTransaction
+        ?.assignedContactId || null
+    );
   }
 
   /**
@@ -124,10 +156,13 @@ export class GetAutofillCategorizeTransctionTransformer extends Transformer {
       this.options.firstUncategorizedTransaction?.recognizedTransaction
         ?.assignedCategory;
 
-    return (
-      assignedCategory ||
-      (this.isDepositTransaction() ? 'other_income' : 'other_expense')
-    );
+    if (assignedCategory) return assignedCategory;
+
+    if (this.options.aiSuggestion?.contactTransactionType) {
+      return this.options.aiSuggestion.contactTransactionType;
+    }
+
+    return this.isDepositTransaction() ? 'other_income' : 'other_expense';
   }
 
   /**
@@ -172,5 +207,37 @@ export class GetAutofillCategorizeTransctionTransformer extends Transformer {
       this.options.firstUncategorizedTransaction?.recognizedTransaction
         ?.bankRule?.name || null
     );
+  }
+
+  public isAiSuggested() {
+    return !!this.options.aiSuggestion;
+  }
+
+  public aiSuggestedAccountId() {
+    return this.options.aiSuggestion?.creditAccountId ?? null;
+  }
+
+  public aiSuggestedAccountName() {
+    return this.options.aiSuggestion?.creditAccountName ?? null;
+  }
+
+  public aiSuggestedPayee() {
+    return this.options.aiSuggestion?.payee ?? null;
+  }
+
+  public aiSuggestedMemo() {
+    return this.options.aiSuggestion?.memo ?? null;
+  }
+
+  public aiConfidence() {
+    return this.options.aiSuggestion?.confidence ?? null;
+  }
+
+  public aiReasoning() {
+    return this.options.aiSuggestion?.reasoning ?? null;
+  }
+
+  public aiSource() {
+    return this.options.aiSuggestion?.source ?? null;
   }
 }

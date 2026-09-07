@@ -28,8 +28,8 @@ export const filterAccountsOptions = [
  * Retrieves the default general ledger query.
  */
 export const getDefaultGeneralLedgerQuery = () => ({
-  fromDate: moment().startOf('month').format('YYYY-MM-DD'),
-  toDate: moment().format('YYYY-MM-DD'),
+  fromDate: moment().startOf('year').format('YYYY-MM-DD'),
+  toDate: moment().endOf('year').format('YYYY-MM-DD'),
   basis: 'accrual',
   filterByOption: 'with-transactions',
   branchesIds: [],
@@ -63,7 +63,7 @@ const parseGeneralLedgerQuery = (locationQuery) => {
 
     // Ensures the branches, accounts ids is always array.
     branchesIds: castArray(transformed.branchesIds),
-    accountsIds: castArray(transformed.accountsIds),
+    accountsIds: castArray(transformed.accountsIds).map(Number).filter(Boolean),
   };
 };
 
@@ -76,7 +76,11 @@ export const useGeneralLedgerQuery = () => {
 
   // Merges the default filter query with location URL query.
   const query = React.useMemo(
-    () => parseGeneralLedgerQuery(locationQuery),
+    () => {
+      const parsed = parseGeneralLedgerQuery(locationQuery);
+      console.log('GL parsed query:', parsed);
+      return parsed;
+    },
     [locationQuery],
   );
   return { query, locationQuery, setLocationQuery };

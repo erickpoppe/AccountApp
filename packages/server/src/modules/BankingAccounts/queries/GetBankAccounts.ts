@@ -47,11 +47,10 @@ export class GetBankAccountsService {
       .onBuild((builder) => {
         dynamicList.buildQuery()(builder);
 
-        builder.whereIn('account_type', [
-          ACCOUNT_TYPE.BANK,
-          ACCOUNT_TYPE.CASH,
-          ACCOUNT_TYPE.CREDIT_CARD,
-        ]);
+        const allowedTypes = filterDTO.accountType
+          ? [filterDTO.accountType]
+          : [ACCOUNT_TYPE.BANK, ACCOUNT_TYPE.CASH, ACCOUNT_TYPE.CREDIT_CARD];
+        builder.whereIn('account_type', allowedTypes);
         builder.modify('inactiveMode', filter.inactiveMode);
       });
     // Retrieves the transformed accounts.

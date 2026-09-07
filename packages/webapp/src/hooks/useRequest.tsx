@@ -48,9 +48,12 @@ export default function useApiRequest() {
     instance.interceptors.response.use(
       (response) => response,
       (error) => {
+        if (!error.response) return Promise.reject(error);
         const { status, data } = error.response;
+        const requestUrl: string = (error.config as any)?.url ?? '';
+        const isAutofillEndpoint = requestUrl.includes('/banking/uncategorized/autofill');
 
-        if (status >= 500) {
+        if (status >= 500 && !isAutofillEndpoint) {
           setGlobalErrors({ something_wrong: true });
         }
         if (status === 401) {

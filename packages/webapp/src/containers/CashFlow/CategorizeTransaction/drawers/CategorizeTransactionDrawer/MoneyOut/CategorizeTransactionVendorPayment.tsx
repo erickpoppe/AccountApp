@@ -50,7 +50,6 @@ export default function CategorizeTransactionVendorPayment() {
         <AccountsSelect
           name={'creditAccountId'}
           items={accounts}
-          filterByRootTypes={['expense', 'liability']}
           fastField
           fill
           allowCreate
@@ -65,7 +64,7 @@ export default function CategorizeTransactionVendorPayment() {
         />
       </FFormGroup>
       <FFormGroup name={'referenceNo'} label={'Reference No.'} fastField inline>
-        <FInputGroup name={'reference_no'} fill />
+        <FInputGroup name={"referenceNo"} fill />
       </FFormGroup>
       <FFormGroup name={'description'} label={'Description'} fastField inline>
         <FTextArea

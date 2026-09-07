@@ -479,6 +479,15 @@ export const SidebarMenu = [
             },
           },
           {
+            text: 'Credit Cards',
+            href: '/credit-card-accounts',
+            type: ISidebarMenuItemType.Link,
+            permission: {
+              subject: AbilitySubject.Cashflow,
+              ability: CashflowAction.View,
+            },
+          },
+          {
             text: 'Rules',
             href: '/bank-rules',
             type: ISidebarMenuItemType.Link,

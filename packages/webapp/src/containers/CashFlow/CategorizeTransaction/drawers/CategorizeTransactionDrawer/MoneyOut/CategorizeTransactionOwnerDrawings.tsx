@@ -51,7 +51,6 @@ export default function CategorizeTransactionOwnerDrawings() {
         <AccountsSelect
           name={'creditAccountId'}
           items={accounts}
-          filterByRootTypes={['equity']}
           fastField
           fill
           allowCreate
@@ -59,7 +58,7 @@ export default function CategorizeTransactionOwnerDrawings() {
       </FFormGroup>
 
       <FFormGroup name={'referenceNo'} label={'Reference No.'} fastField inline>
-        <FInputGroup name={'reference_no'} fill />
+        <FInputGroup name={"referenceNo"} fill />
       </FFormGroup>
 
       <FFormGroup name={'description'} label={'Description'} fastField inline>

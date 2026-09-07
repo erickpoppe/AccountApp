@@ -1217,12 +1217,34 @@ export const getDashboardRoutes = () => [
     defaultSearchResource: RESOURCES_TYPES.ACCOUNT,
   },
   {
+    path: `/cashflow-accounts/:id/reconcile`,
+    component: lazy(
+      () =>
+        import(
+          '@/containers/CashFlow/Reconciliation/ReconcileAccountPage'
+        ).then((m) => ({ default: m.ReconcileAccountPage })),
+    ),
+    backLink: true,
+    sidebarExpand: false,
+    pageTitle: 'Reconcile Account',
+    subscriptionActive: [SUBSCRIPTION_TYPE.MAIN],
+  },
+  {
     path: `/cashflow-accounts`,
     component: lazy(
       () =>
         import('@/containers/CashFlow/CashFlowAccounts/CashFlowAccountsList'),
     ),
     pageTitle: intl.get('siebar.banking.bank_accounts'),
+    subscriptionActive: [SUBSCRIPTION_TYPE.MAIN],
+    defaultSearchResource: RESOURCES_TYPES.ACCOUNT,
+  },
+  {
+    path: `/credit-card-accounts`,
+    component: lazy(
+      () => import('@/containers/CreditCardAccounts/CreditCardAccountsList'),
+    ),
+    pageTitle: 'Credit Cards',
     subscriptionActive: [SUBSCRIPTION_TYPE.MAIN],
     defaultSearchResource: RESOURCES_TYPES.ACCOUNT,
   },

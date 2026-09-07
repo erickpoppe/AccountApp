@@ -32,6 +32,7 @@ import { BankingUncategorizedTransactionsController } from './controllers/Bankin
 import { BankingPendingTransactionsController } from './controllers/BankingPendingTransactions.controller';
 import { GetPendingBankAccountTransactions } from './queries/GetPendingBankAccountTransaction.service';
 import { GetAutofillCategorizeTransactionService } from './queries/GetAutofillCategorizeTransaction/GetAutofillCategorizeTransaction.service';
+import { BankingAiCategorizeModule } from '../BankingAiCategorize/BankingAiCategorize.module';
 
 const models = [
   RegisterTenancyModel(UncategorizedBankTransaction),
@@ -46,6 +47,7 @@ const models = [
     LedgerModule,
     BranchesModule,
     DynamicListModule,
+    BankingAiCategorizeModule,
     ...models,
   ],
   controllers: [

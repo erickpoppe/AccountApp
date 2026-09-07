@@ -10,8 +10,8 @@ import { transformToForm } from '@/utils';
  */
 export const getDefaultJournalQuery = () => {
   return {
-    fromDate: moment().startOf('month').format('YYYY-MM-DD'),
-    toDate: moment().format('YYYY-MM-DD'),
+    fromDate: moment().startOf('year').format('YYYY-MM-DD'),
+    toDate: moment().endOf('year').format('YYYY-MM-DD'),
     basis: 'accrual',
   };
 };

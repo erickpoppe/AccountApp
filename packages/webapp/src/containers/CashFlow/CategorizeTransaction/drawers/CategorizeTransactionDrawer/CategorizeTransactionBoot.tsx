@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { first } from 'lodash';
 import { DrawerLoading } from '@/components';
-import { useAccounts, useBranches, useVendors } from '@/hooks/query';
+import { useAccounts, useBranches, useVendors, useCustomers } from '@/hooks/query';
 import { useFeatureCan } from '@/hooks/state';
 import { Features } from '@/constants';
 import { Spinner } from '@blueprintjs/core';
@@ -25,6 +25,7 @@ interface CategorizeTransactionBootValue {
   autofillCategorizeValues: null | GetAutofillCategorizeTransaction;
   isAutofillCategorizeValuesLoading: boolean;
   vendors: any;
+  customers: any;
 }
 
 const CategorizeTransactionBootContext =
@@ -52,7 +53,11 @@ function CategorizeTransactionBoot({
     { enabled: isBranchFeatureCan },
   );
   // Fetches vendors list.
-  const { data: vendors } = useVendors({}, {});
+  const { data: vendorsData } = useVendors({}, {});
+  const vendors = vendorsData?.vendors || [];
+  // Fetches customers list.
+  const { data: customersData } = useCustomers({}, {});
+  const customers = customersData?.customers || [];
   // Fetches the autofill values of categorize transaction.
   const {
     data: autofillCategorizeValues,
@@ -74,6 +79,7 @@ function CategorizeTransactionBoot({
     autofillCategorizeValues,
     isAutofillCategorizeValuesLoading,
     vendors,
+    customers,
   };
   const isLoading =
     isBranchesLoading || isAccountsLoading || isAutofillCategorizeValuesLoading;

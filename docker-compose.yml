@@ -42,6 +42,35 @@ services:
     ports:
       - '9000:3000'
 
+  # Local LLM for AI-assisted transaction categorization.
+  # Enable by setting BANKING_AI_ENABLED=true in the server environment.
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_models:/root/.ollama
+    expose:
+      - '11434'
+    ports:
+      - '11434:11434'
+    healthcheck:
+      test: ['CMD', 'ollama', 'list']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: unless-stopped
+
+  # One-shot container that pre-pulls the model on first run.
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: >
+      sh -c "OLLAMA_HOST=ollama:11434 ollama pull ${BANKING_AI_MODEL:-qwen2.5:3b-instruct}"
+    restart: 'no'
+
 # Volumes
 volumes:
   mysql:
@@ -50,4 +79,8 @@ volumes:
 
   redis:
     name: bigcapital_dev_redis
+    driver: local
+
+  ollama_models:
+    name: bigcapital_dev_ollama_models
     driver: local

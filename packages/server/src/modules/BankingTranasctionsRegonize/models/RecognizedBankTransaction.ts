@@ -8,6 +8,7 @@ export class RecognizedBankTransaction extends BaseModel {
   public assignedAccountId!: number;
   public assignedPayee!: string;
   public assignedMemo!: string;
+  public assignedContactId!: number;
 
   /**
    * Table name.

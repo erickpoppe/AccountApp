@@ -131,29 +131,29 @@ export class TransactionsByVendorRepository extends TransactionsByContactReposit
   /**
    * Retrieve the vendors opening balance transactions.
    * @param {Date} openingDate - The opening date.
-   * @param {number[]} customersIds - The customers ids.
+   * @param {number[]} vendorsIds - The vendors ids.
    * @returns {Promise<ILedgerEntry[]>}
    */
   public async getVendorsOpeningBalanceEntries(
     openingDate: Date,
-    customersIds?: number[],
+    vendorsIds?: number[],
   ): Promise<ILedgerEntry[]> {
     const openingTransactions = await this.getVendorsOpeningBalance(
       openingDate,
-      customersIds,
+      vendorsIds,
     );
 
     // @ts-ignore
     return R.compose(
       R.map(R.assoc('date', openingDate)),
-      R.map(R.assoc('accountNormal', 'credit')),
+      R.map(R.assoc('accountNormal', 'debit')),
     )(openingTransactions);
   }
 
   /**
    * Retrieve the vendors period transactions.
-   * @param {Date|string} openingDate
-   * @param {number[]} customersIds
+   * @param {DateInput} fromDate
+   * @param {DateInput} toDate
    */
   public async getVendorsPeriodEntries(
     fromDate: DateInput,
@@ -165,10 +165,12 @@ export class TransactionsByVendorRepository extends TransactionsByContactReposit
     );
     // @ts-ignore
     return R.compose(
-      R.map(R.assoc('accountNormal', 'credit')),
+      R.map(R.assoc('accountNormal', 'debit')),
       R.map((trans) => ({
         // @ts-ignore
         ...trans,
+        // @ts-ignore
+        contactId: trans.contactId,
         // @ts-ignore
         referenceTypeFormatted: trans.referenceTypeFormatted,
       })),
@@ -187,9 +189,10 @@ export class TransactionsByVendorRepository extends TransactionsByContactReposit
     toDate: DateInput,
   ): Promise<ILedgerEntry[]> {
     const openingBalanceDate = moment(fromDate).subtract(1, 'days').toDate();
+    const vendorIds = map(this.vendors, 'id') as number[];
 
     return [
-      ...(await this.getVendorsOpeningBalanceEntries(openingBalanceDate)),
+      ...(await this.getVendorsOpeningBalanceEntries(openingBalanceDate, vendorIds)),
       ...(await this.getVendorsPeriodEntries(fromDate, toDate)),
     ];
   }
@@ -212,36 +215,39 @@ export class TransactionsByVendorRepository extends TransactionsByContactReposit
   }
 
   /**
-   * Retrieve the accounts receivable.
-   * @returns {Promise<IAccount[]>}
+   * Retrieves the expense accounts (used for bank-categorized vendor transactions).
+   * @returns {Promise<Account[]>}
    */
-  public async getPayableAccounts(): Promise<Account[]> {
-    const accounts = await this.accountModel()
+  public async getExpenseAccounts(): Promise<Account[]> {
+    return this.accountModel()
       .query()
-      .where('accountType', ACCOUNT_TYPE.ACCOUNTS_PAYABLE);
-    return accounts;
+      .whereIn('accountType', [
+        ACCOUNT_TYPE.EXPENSE,
+        ACCOUNT_TYPE.OTHER_EXPENSE,
+        ACCOUNT_TYPE.COST_OF_GOODS_SOLD,
+      ]);
   }
 
   /**
-   * Retrieve the customers opening balance transactions.
+   * Retrieve the vendors opening balance transactions.
    * @param {Date} openingDate - The opening date.
-   * @param {number[]} customersIds - The customers IDs.
+   * @param {number[]} vendorsIds - The vendors IDs.
    * @returns {Promise<AccountTransaction[]>}
    */
   public async getVendorsOpeningBalance(
     openingDate: Date,
-    customersIds?: number[],
+    vendorsIds?: number[],
   ): Promise<AccountTransaction[]> {
-    const payableAccounts = await this.getPayableAccounts();
-    const payableAccountsIds = map(payableAccounts, 'id');
+    const expenseAccounts = await this.getExpenseAccounts();
+    const expenseAccountIds = map(expenseAccounts, 'id');
 
     const openingTransactions = await this.accountTransactionModel()
       .query()
       .modify(
         'contactsOpeningBalance',
         openingDate,
-        payableAccountsIds,
-        customersIds,
+        expenseAccountIds,
+        vendorsIds,
       );
     return openingTransactions;
   }
@@ -256,20 +262,20 @@ export class TransactionsByVendorRepository extends TransactionsByContactReposit
     fromDate: DateInput,
     toDate: DateInput,
   ): Promise<AccountTransaction[]> {
-    const receivableAccounts = await this.getPayableAccounts();
-    const receivableAccountsIds = map(receivableAccounts, 'id');
+    const expenseAccounts = await this.getExpenseAccounts();
+    const expenseAccountIds = map(expenseAccounts, 'id');
+    const vendorIds = map(this.vendors, 'id') as number[];
 
     const transactions = await this.accountTransactionModel()
       .query()
       .onBuild((query) => {
-        // Filter by date.
         query.modify('filterDateRange', fromDate, toDate);
-
-        // Filter by customers.
-        query.whereNot('contactId', null);
-
-        // Filter by accounts.
-        query.whereIn('accountId', receivableAccountsIds);
+        query.whereIn('accountId', expenseAccountIds);
+        if (vendorIds.length > 0) {
+          query.whereIn('contactId', vendorIds);
+        } else {
+          query.whereNot('contactId', null);
+        }
       });
     return transactions;
   }

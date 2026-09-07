@@ -1,4 +1,4 @@
-FROM bigcapitalhq/server:latest as build
+FROM epoppe/server:latest as build
 
 ARG DB_HOST= \
   DB_USER= \

@@ -67,5 +67,12 @@ export class GeneralLedgerQueryDto extends FinancialSheetBranchesQueryDto {
   })
   @IsArray()
   @IsOptional()
+  @Transform(({ value, obj }) => {
+    const val = value ?? obj?.accounts_ids;
+    if (!val) return [];
+    return Array.isArray(val)
+      ? val.map(Number).filter(Boolean)
+      : [Number(val)].filter(Boolean);
+  })
   accountsIds: number[];
 }

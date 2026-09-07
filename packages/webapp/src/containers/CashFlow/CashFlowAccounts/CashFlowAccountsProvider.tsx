@@ -10,10 +10,12 @@ const CashFlowAccountsContext = React.createContext();
 /**
  * Cash Flow data provider.
  */
-function CashFlowAccountsProvider({ tableState, ...props }) {
-  const query = transformAccountsStateToQuery(tableState);
+function CashFlowAccountsProvider({ tableState, filterByType, ...props }) {
+  const query = {
+    ...(tableState ? transformAccountsStateToQuery(tableState) : {}),
+    ...(filterByType ? { accountType: filterByType } : {}),
+  };
 
-  // Fetch cash flow list .
   const {
     data: cashflowAccounts,
     isFetching: isCashFlowAccountsFetching,

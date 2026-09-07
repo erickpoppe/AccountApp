@@ -1,0 +1,119 @@
+services:
+  proxy:
+    image: envoyproxy/envoy:v1.30-latest
+    depends_on:
+      - server
+      - webapp
+    ports:
+      - '80:80'
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    restart: on-failure
+    networks:
+      - bigcapital_network
+
+  webapp:
+    image: epoppe/webapp:latest
+    restart: on-failure
+    networks:
+      - bigcapital_network
+
+  server:
+    image: epoppe/server:latest
+    expose:
+      - '3000'
+    depends_on:
+      - mysql
+      - redis
+    restart: on-failure
+    env_file: .env
+    networks:
+      - bigcapital_network
+    environment:
+      - MAIL_HOST=${MAIL_HOST:-mailhog}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_PORT=${MAIL_PORT:-1025}
+      - MAIL_SECURE=${MAIL_SECURE:-false}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME:-Bigcapital}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-no-reply@bigcapital.com}
+      - DB_HOST=mysql
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_CHARSET=${DB_CHARSET:-utf8}
+      - SYSTEM_DB_NAME=${SYSTEM_DB_NAME}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_HOST=redis
+      - QUEUE_PORT=6379
+      - TENANT_DB_NAME_PERFIX=${TENANT_DB_NAME_PERFIX}
+      - JWT_SECRET=${JWT_SECRET}
+      - BASE_URL=${BASE_URL}
+      - SIGNUP_DISABLED=${SIGNUP_DISABLED:-false}
+      - SIGNUP_ALLOWED_DOMAINS=${SIGNUP_ALLOWED_DOMAINS}
+      - SIGNUP_ALLOWED_EMAILS=${SIGNUP_ALLOWED_EMAILS}
+      - SIGNUP_EMAIL_CONFIRMATION=${SIGNUP_EMAIL_CONFIRMATION:-false}
+      - GOTENBERG_URL=http://gotenberg:3000
+      - GOTENBERG_DOCS_URL=http://server:3000/public/
+      - BANK_FEED_ENABLED=${BANK_FEED_ENABLED:-false}
+      - BANKING_AI_ENABLED=${BANKING_AI_ENABLED:-false}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - BANKING_AI_MODEL=${BANKING_AI_MODEL:-qwen2.5:3b-instruct}
+      - BANKING_AI_TIMEOUT_MS=${BANKING_AI_TIMEOUT_MS:-30000}
+      - NEW_RELIC_DISTRIBUTED_TRACING_ENABLED=false
+      - NEW_RELIC_LOG=stdout
+      - HOSTED_ON_BIGCAPITAL_CLOUD=false
+
+  database_migration:
+    image: epoppe/migration:latest
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_CHARSET=${DB_CHARSET:-utf8}
+      - SYSTEM_DB_NAME=${SYSTEM_DB_NAME}
+      - TENANT_DB_NAME_PERFIX=${TENANT_DB_NAME_PERFIX}
+    depends_on:
+      - mysql
+    networks:
+      - bigcapital_network
+
+  mysql:
+    image: epoppe/mysql:latest
+    restart: on-failure
+    environment:
+      - MYSQL_DATABASE=${SYSTEM_DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql:/var/lib/mysql
+    expose:
+      - '3306'
+    networks:
+      - bigcapital_network
+
+  redis:
+    image: epoppe/redis:latest
+    restart: on-failure
+    volumes:
+      - redis:/data
+    expose:
+      - '6379'
+    networks:
+      - bigcapital_network
+
+  gotenberg:
+    image: gotenberg/gotenberg:7
+    expose:
+      - '9000'
+    networks:
+      - bigcapital_network
+
+volumes:
+  mysql:
+  redis:
+
+networks:
+  bigcapital_network:
+    driver: bridge

@@ -104,4 +104,13 @@ export class BankAccountsQueryDto {
   @Transform(({ value }) => parseBoolean(value, false))
   @IsBoolean()
   inactiveMode?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Filter by account type (bank, cash, credit-card)',
+    type: String,
+    example: 'credit-card',
+  })
+  @IsOptional()
+  @IsString()
+  accountType?: string;
 }

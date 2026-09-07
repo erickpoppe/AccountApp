@@ -33,6 +33,8 @@ export enum CASHFLOW_TRANSACTION_TYPE {
   TRANSFER_FROM_ACCOUNT = 'TransferFromAccount',
   TRANSFER_TO_ACCOUNT = 'TransferToAccount',
   OTHER_EXPENSE = 'OtherExpense',
+  VENDOR_PAYMENT = 'VendorPayment',
+  CUSTOMER_PAYMENT = 'CustomerPayment',
 }
 
 export const CASHFLOW_TRANSACTION_TYPE_META = {
@@ -67,6 +69,10 @@ export const CASHFLOW_TRANSACTION_TYPE_META = {
       ACCOUNT_TYPE.CASH,
       ACCOUNT_TYPE.BANK,
       ACCOUNT_TYPE.CREDIT_CARD,
+      ACCOUNT_TYPE.OTHER_CURRENT_LIABILITY,
+      ACCOUNT_TYPE.LOGN_TERM_LIABILITY,
+      ACCOUNT_TYPE.NON_CURRENT_LIABILITY,
+      ACCOUNT_TYPE.ACCOUNTS_PAYABLE,
     ],
   },
   [`${CASHFLOW_TRANSACTION_TYPE.OTHER_EXPENSE}`]: {
@@ -76,6 +82,24 @@ export const CASHFLOW_TRANSACTION_TYPE_META = {
       ACCOUNT_TYPE.EXPENSE,
       ACCOUNT_TYPE.OTHER_EXPENSE,
       ACCOUNT_TYPE.COST_OF_GOODS_SOLD,
+    ],
+  },
+  [`VendorPayment`]: {
+    type: 'vendor_payment',
+    direction: CASHFLOW_DIRECTION.OUT,
+    creditType: [
+      ACCOUNT_TYPE.EXPENSE,
+      ACCOUNT_TYPE.OTHER_EXPENSE,
+      ACCOUNT_TYPE.ACCOUNTS_PAYABLE,
+    ],
+  },
+  [`CustomerPayment`]: {
+    type: 'customer_payment',
+    direction: CASHFLOW_DIRECTION.IN,
+    creditType: [
+      ACCOUNT_TYPE.INCOME,
+      ACCOUNT_TYPE.OTHER_INCOME,
+      ACCOUNT_TYPE.ACCOUNTS_RECEIVABLE,
     ],
   },
 };
@@ -117,6 +141,8 @@ export const CashflowTransactionTypes = {
   OwnerContribution: 'transaction_type.owner_contribution',
   TransferToAccount: 'transaction_type.transfer_to_account',
   TransferFromAccount: 'transaction_type.transfer_from_account',
+  VendorPayment: 'transaction_type.vendor_payment',
+  CustomerPayment: 'transaction_type.customer_payment',
 };
 
 export const TransactionTypes = {

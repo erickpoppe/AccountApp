@@ -64,8 +64,9 @@ function AccountFormDialogContent({
       : values.name;
 
     // Handle request success.
-    const handleSuccess = () => {
+    const handleSuccess = (response) => {
       closeDialog(dialogName);
+      payload.onAccountCreated?.(response.data);
 
       AppToaster.show({
         message: intl.get(

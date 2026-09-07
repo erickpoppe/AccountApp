@@ -1,7 +1,7 @@
 import React, { createContext } from 'react';
 import { DialogContent } from '@/components';
 import { useBankRule } from '@/hooks/query/bank-rules';
-import { useAccounts } from '@/hooks/query';
+import { useAccounts, useVendors, useCustomers } from '@/hooks/query';
 
 interface RuleFormBootValues {
   bankRule?: null;
@@ -9,6 +9,8 @@ interface RuleFormBootValues {
   isBankRuleLoading: boolean;
   isEditMode: boolean;
   isNewMode: boolean;
+  vendors?: any[];
+  customers?: any[];
 }
 
 const RuleFormBootContext = createContext<RuleFormBootValues>(
@@ -28,6 +30,8 @@ function RuleFormBoot({ bankRuleId, ...props }: RuleFormBootProps) {
     },
   );
   const { data: accounts, isLoading: isAccountsLoading } = useAccounts({}, {});
+  const { data: vendorsData } = useVendors({ page_size: 10000 }, {});
+  const { data: customersData } = useCustomers({ page_size: 10000 }, {});
 
   const isNewMode = !bankRuleId;
   const isEditMode = !isNewMode;
@@ -36,6 +40,8 @@ function RuleFormBoot({ bankRuleId, ...props }: RuleFormBootProps) {
     bankRuleId,
     bankRule,
     accounts,
+    vendors: vendorsData?.vendors || [],
+    customers: customersData?.customers || [],
     isBankRuleLoading,
     isAccountsLoading,
     isEditMode,

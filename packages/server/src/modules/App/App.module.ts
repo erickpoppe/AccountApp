@@ -100,6 +100,7 @@ import { UsersModule } from '../UsersModule/Users.module';
 import { ContactsModule } from '../Contacts/Contacts.module';
 import { BankingPlaidModule } from '../BankingPlaid/BankingPlaid.module';
 import { BankingCategorizeModule } from '../BankingCategorize/BankingCategorize.module';
+import { BankingReconciliationModule } from '../BankingReconciliation/BankingReconciliation.module';
 import { TenantModelsInitializeModule } from '../Tenancy/TenantModelsInitialize.module';
 import { BillLandedCostsModule } from '../BillLandedCosts/BillLandedCosts.module';
 import { SocketModule } from '../Socket/Socket.module';
@@ -230,6 +231,7 @@ import { AppThrottleModule } from './AppThrottle.module';
     BankingMatchingModule,
     BankingPlaidModule,
     BankingCategorizeModule,
+    BankingReconciliationModule,
     TransactionsLockingModule,
     SettingsModule,
     FeaturesModule,

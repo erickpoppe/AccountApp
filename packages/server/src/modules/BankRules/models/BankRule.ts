@@ -14,6 +14,7 @@ export class BankRule extends TenantBaseModel {
   public readonly assignAccountId!: number;
   public readonly assignPayee!: string;
   public readonly assignMemo!: string;
+  public readonly assignContactId!: number;
   public readonly conditionsType!: BankRuleConditionType;
 
   public readonly conditions!: BankRuleCondition[];

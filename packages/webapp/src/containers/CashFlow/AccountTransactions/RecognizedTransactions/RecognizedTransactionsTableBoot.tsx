@@ -13,10 +13,24 @@ interface RecognizedTransactionsContextValue {
   recognizedTransactions: Array<any>;
 }
 
+
+//const RecognizedTransactionsContext = React.createContext<any>({});
+
+
 const RecognizedTransactionsContext =
   React.createContext<RecognizedTransactionsContextValue>(
     {} as RecognizedTransactionsContextValue,
   );
+
+//const [selectedRows, setSelectedRows] = React.useState([]);
+
+//const provider = {
+//  recognizedTransactions,
+//  isRecognizedTransactionsFetching,
+//  isRecongizedTransactionsLoading,
+//  selectedRows,
+//  setSelectedRows,
+//};
 
 function flattenInfinityPagesData(data) {
   return flatten(map(data.pages, (page) => page.data));

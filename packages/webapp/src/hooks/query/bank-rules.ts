@@ -590,8 +590,20 @@ export interface GetAutofillCategorizeTransaction {
   recognizedByRuleId: number | null;
   recognizedByRuleName: string | null;
   referenceNo: null | string;
+  description: null | string;
   isDepositTransaction: boolean;
   isWithdrawalTransaction: boolean;
+  contactId: number | null;
+  transactionType: string | null;
+  isAiSuggested: boolean;
+  isHistoryAutoFill: boolean;
+  aiSuggestedAccountId: number | null;
+  aiSuggestedAccountName: string | null;
+  aiSuggestedPayee: string | null;
+  aiSuggestedMemo: string | null;
+  aiConfidence: 'low' | 'medium' | 'high' | null;
+  aiReasoning: string | null;
+  aiSource: 'history' | 'llm' | null;
 }
 
 export function useGetAutofillCategorizeTransaction(

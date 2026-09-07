@@ -16,6 +16,7 @@ export const initialValues = {
   ],
   assignCategory: '',
   assignAccountId: '',
+  assignContactId: '',
 };
 
 export interface RuleFormValues {
@@ -31,6 +32,7 @@ export interface RuleFormValues {
   }>;
   assignCategory: string;
   assignAccountId: string;
+  assignContactId: string | number;
 }
 
 export const TransactionTypeOptions = [

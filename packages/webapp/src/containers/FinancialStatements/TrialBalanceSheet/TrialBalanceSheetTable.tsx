@@ -2,11 +2,11 @@
 import React from 'react';
 import intl from 'react-intl-universal';
 import styled from 'styled-components';
-
+// 1
+import { useHistory } from 'react-router-dom';
 import { TableStyle } from '@/constants';
 import { tableRowTypesToClassnames } from '@/utils';
 import { ReportDataTable, FinancialSheet } from '@/components';
-
 import { useTrialBalanceSheetContext } from './TrialBalanceProvider';
 import { useTrialBalanceSheetTableColumns } from './hooks';
 
@@ -14,6 +14,7 @@ import { useTrialBalanceSheetTableColumns } from './hooks';
  * Trial Balance sheet data table.
  */
 export default function TrialBalanceSheetTable({ companyName }) {
+  const history = useHistory();
   // Trial balance sheet context.
   const {
     trialBalanceSheet: { table, query, meta },
@@ -22,6 +23,19 @@ export default function TrialBalanceSheetTable({ companyName }) {
 
   // Trial balance sheet table columns.
   const columns = useTrialBalanceSheetTableColumns();
+
+  const handleCellClick = (cell) => {
+    const { id } = cell.row.original;
+    // Skip total row and any non-account rows
+    if (!id || id === 'total' || typeof id !== 'number') return;
+
+    const params = new URLSearchParams({
+      accountsIds: id,
+      fromDate: query?.fromDate || '',
+      toDate: query?.toDate || '',
+    });
+    history.push(`/financial-reports/general-ledger?${params.toString()}`);
+  };
 
   return (
     <FinancialSheet
@@ -41,6 +55,7 @@ export default function TrialBalanceSheetTable({ companyName }) {
         sticky={true}
         rowClassNames={tableRowTypesToClassnames}
         styleName={TableStyle.Constrant}
+        onCellClick={handleCellClick}
       />
     </FinancialSheet>
   );

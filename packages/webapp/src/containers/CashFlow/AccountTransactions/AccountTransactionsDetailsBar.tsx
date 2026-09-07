@@ -110,6 +110,21 @@ function AccountTransactionsDetailsBarSkeleton() {
   );
 }
 
+function ReconcileButton() {
+  const { push } = useHistory();
+  const { accountId } = useAccountTransactionsContext();
+
+  return (
+    <ReconcileButtonBase
+      minimal
+      icon="bank-account"
+      onClick={() => push(`/cashflow-accounts/${accountId}/reconcile`)}
+    >
+      Reconcile
+    </ReconcileButtonBase>
+  );
+}
+
 function AccountTransactionsDetailsContent() {
   const { hideAside } = useAppShellContext();
 
@@ -121,6 +136,8 @@ function AccountTransactionsDetailsContent() {
       {hideAside && <AccountNumberItem />}
       <AccountBalanceItem />
       {hideAside && <AccountBankBalanceItem />}
+      <DetailsBarSpacer />
+      <ReconcileButton />
     </React.Fragment>
   );
 }
@@ -210,6 +227,12 @@ const AccountSwitchItemUpdatedAt = styled.div`
   opacity: 0.5;
 `;
 
+const DetailsBarSpacer = styled.div`
+  flex: 1;
+`;
+const ReconcileButtonBase = styled(Button)`
+  margin-left: 8px;
+`;
 const AccountSwitchButtonBase = styled(Button)`
   .bp4-button-text {
     margin-right: 5px;

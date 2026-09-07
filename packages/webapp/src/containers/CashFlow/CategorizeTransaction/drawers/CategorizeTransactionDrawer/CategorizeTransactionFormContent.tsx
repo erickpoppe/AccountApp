@@ -7,6 +7,7 @@ import { getAddMoneyInOptions, getAddMoneyOutOptions } from '@/constants';
 import { useFormikContext } from 'formik';
 import { useCategorizeTransactionTabsBoot } from '@/containers/CashFlow/CategorizeTransactionAside/CategorizeTransactionTabsBoot';
 import { useCategorizeTransactionBoot } from './CategorizeTransactionBoot';
+import { AiSuggestionBanner } from './AiSuggestionBanner';
 
 // Retrieves the add money in button options.
 const MoneyInOptions = getAddMoneyInOptions();
@@ -32,6 +33,8 @@ export function CategorizeTransactionFormContent() {
       <FormGroup label={'Amount'} inline>
         <Title>{formattedAmount}</Title>
       </FormGroup>
+
+      <AiSuggestionBanner />
 
       <FFormGroup name={'category'} label={'Category'} fastField inline>
         <FSelect
@@ -75,6 +78,9 @@ const CategorizeTransactionOwnerDrawings = React.lazy(
 const CategorizeTransactionVendorPayment = React.lazy(
   () => import('./MoneyOut/CategorizeTransactionVendorPayment'),
 );
+const CategorizeTransactionCustomerPayment = React.lazy(
+  () => import('./MoneyIn/CategorizeTransactionCustomerPayment'),
+);
 
 function CategorizeTransactionFormSubContent() {
   const { values } = useFormikContext();
@@ -99,6 +105,8 @@ function CategorizeTransactionFormSubContent() {
     return <CategorizeTransactionOwnerDrawings />;
   } else if (values.transactionType === 'vendor_payment') {
     return <CategorizeTransactionVendorPayment />;
+  } else if (values.transactionType === 'customer_payment') {
+    return <CategorizeTransactionCustomerPayment />;
   }
   return null;
 }

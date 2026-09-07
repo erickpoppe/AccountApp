@@ -16,6 +16,8 @@ import {
   Group,
   Stack,
 } from '@/components';
+import { VendorsSelect } from '@/components/Vendors/VendorsSelect';
+import { CustomersSelect } from '@/components/Customers/CustomersSelect';
 import { useCreateBankRule, useEditBankRule } from '@/hooks/query/bank-rules';
 import {
   Fields,
@@ -142,6 +144,7 @@ function RuleFormContentFormRoot({
 
         <RuleAssignCategoryField />
         <RuleAssignCategoryAccountField />
+        <RuleAssignContactField />
 
         <FFormGroup
           name={'assignRef'}
@@ -294,6 +297,7 @@ function RuleApplyIfTransactionTypeField() {
       setFieldValue('applyIfTransactionType', item.value);
       setFieldValue('assignCategory', '');
       setFieldValue('assignAccountId', '');
+      setFieldValue('assignContactId', '');
     },
     [setFieldValue],
   );
@@ -385,4 +389,48 @@ function RuleAssignCategoryAccountField() {
       />
     </FFormGroup>
   );
+}
+
+function RuleAssignContactField() {
+  const { values } = useFormikContext<RuleFormValues>();
+  const { vendors, customers } = useRuleFormDialogBoot();
+
+  const isWithdrawal = values.applyIfTransactionType === 'withdrawal';
+  const isDeposit = values.applyIfTransactionType === 'deposit';
+
+  if (isWithdrawal) {
+    return (
+      <FFormGroup
+        name={'assignContactId'}
+        label={'Vendor'}
+        style={{ maxWidth: 300 }}
+        fastField
+      >
+        <VendorsSelect
+          name={'assignContactId'}
+          items={vendors || []}
+          fastField
+          fill
+        />
+      </FFormGroup>
+    );
+  }
+  if (isDeposit) {
+    return (
+      <FFormGroup
+        name={'assignContactId'}
+        label={'Customer'}
+        style={{ maxWidth: 300 }}
+        fastField
+      >
+        <CustomersSelect
+          name={'assignContactId'}
+          items={customers || []}
+          fastField
+          fill
+        />
+      </FFormGroup>
+    );
+  }
+  return null;
 }

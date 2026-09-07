@@ -14,6 +14,10 @@ export const getAddMoneyInOptions = () => [
     name: intl.get('banking.transfer_form_account'),
     value: 'transfer_from_account',
   },
+  {
+    name: 'Customer Payment',
+    value: 'customer_payment',
+  },
 ];
 
 export const getAddMoneyOutOptions = () => [

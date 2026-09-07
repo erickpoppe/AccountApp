@@ -93,30 +93,26 @@ export class GetBankAccountTransactions extends FinancialSheet {
    */
   private transactionNode = (transaction: any): ICashflowAccountTransaction => {
     const status = this.getTransactionStatus(transaction);
-    const uncategorizedTransactionId =
-      this.getUncategorizedTransId(transaction);
+    const uncategorizedTransactionId = this.getUncategorizedTransId(transaction);
+    const uncategorizedTrans = this.repo.uncategorizedTransactionsMapByRef.get(
+      `${transaction.referenceType}-${transaction.referenceId}`,
+    );
 
     return {
       date: transaction.date,
       formattedDate: moment(transaction.date).format('YYYY-MM-DD'),
-
       withdrawal: transaction.credit,
       deposit: transaction.debit,
-
       formattedDeposit: this.formatNumber(transaction.debit),
       formattedWithdrawal: this.formatNumber(transaction.credit),
-
       referenceId: transaction.referenceId,
       referenceType: transaction.referenceType,
-
       formattedTransactionType: this.i18n.t(transaction.referenceTypeFormatted),
-
       transactionNumber: transaction.transactionNumber,
       referenceNumber: transaction.referenceNumber,
-
+      description: (uncategorizedTrans || [])[0]?.description || '',
       runningBalance: this.runningBalance.amount(),
       formattedRunningBalance: this.formatNumber(this.runningBalance.amount()),
-
       balance: 0,
       formattedBalance: '',
       status,
@@ -124,6 +120,41 @@ export class GetBankAccountTransactions extends FinancialSheet {
       uncategorizedTransactionId,
     };
   };
+
+//  private transactionNode = (transaction: any): ICashflowAccountTransaction => {
+//    const status = this.getTransactionStatus(transaction);
+//    const uncategorizedTransactionId =
+//      this.getUncategorizedTransId(transaction);
+
+//    return {
+//      date: transaction.date,
+//      formattedDate: moment(transaction.date).format('YYYY-MM-DD'),
+
+//      withdrawal: transaction.credit,
+//      deposit: transaction.debit,
+
+//      formattedDeposit: this.formatNumber(transaction.debit),
+//      formattedWithdrawal: this.formatNumber(transaction.credit),
+
+//      referenceId: transaction.referenceId,
+//      referenceType: transaction.referenceType,
+
+//      formattedTransactionType: this.i18n.t(transaction.referenceTypeFormatted),
+
+//      transactionNumber: transaction.transactionNumber,
+//      referenceNumber: transaction.referenceNumber,
+//      description: uncategorizedTrans?.[0]?.description ?? '',
+
+//      runningBalance: this.runningBalance.amount(),
+//      formattedRunningBalance: this.formatNumber(this.runningBalance.amount()),
+
+//      balance: 0,
+//      formattedBalance: '',
+//      status,
+//      formattedStatus: formatBankTransactionsStatus(status),
+//      uncategorizedTransactionId,
+//    };
+//  };
 
   /**
    * Associate cashflow transaction node with running balance attribute.

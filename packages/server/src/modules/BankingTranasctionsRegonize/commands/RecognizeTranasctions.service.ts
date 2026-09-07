@@ -47,6 +47,7 @@ export class RecognizeTranasctionsService {
         assignedAccountId: bankRule.assignAccountId,
         assignedPayee: bankRule.assignPayee,
         assignedMemo: bankRule.assignMemo,
+        assignedContactId: bankRule.assignContactId,
       });
 
     await this.uncategorizedCashflowTransactionModel()

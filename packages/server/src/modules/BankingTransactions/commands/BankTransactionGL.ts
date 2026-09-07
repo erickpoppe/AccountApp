@@ -36,6 +36,7 @@ export class BankTransactionGL {
 
       branchId: this.bankTransactionModel.branchId,
       userId: this.bankTransactionModel.userId,
+      contactId: this.bankTransactionModel.contactId,
     };
   }
 

@@ -126,6 +126,16 @@ export class CommandBankRuleDto {
     example: 'Monthly Salary',
   })
   assignMemo?: string;
+
+  @IsOptional()
+  @ToNumber()
+  @IsInt()
+  @Min(0)
+  @ApiProperty({
+    description: 'The contact (vendor/customer) ID to assign the rule if',
+    example: 1,
+  })
+  assignContactId?: number;
 }
 
 export class CreateBankRuleDto extends CommandBankRuleDto {}
